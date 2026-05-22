@@ -278,23 +278,35 @@ int obj_init(unsigned char* buf, int width, int height, int pitch)
 
     memset(objectTable, 0, sizeof(objectTable));
 
+    debug_printf("obj_init: buf=%p width=%d height=%d pitch=%d\n", buf, width, height, pitch);
+
+    debug_printf("obj_init: > obj_offset_table_init\n");
     if (obj_offset_table_init() == -1) {
+        debug_printf("obj_init: obj_offset_table_init FAILED\n");
         return -1;
     }
 
+    debug_printf("obj_init: > obj_order_table_init\n");
     if (obj_order_table_init() == -1) {
+        debug_printf("obj_init: obj_order_table_init FAILED\n");
         goto err;
     }
 
+    debug_printf("obj_init: > obj_render_table_init\n");
     if (obj_render_table_init() == -1) {
+        debug_printf("obj_init: obj_render_table_init FAILED\n");
         goto err_2;
     }
 
+    debug_printf("obj_init: > light_init\n");
     if (light_init() == -1) {
+        debug_printf("obj_init: light_init FAILED\n");
         goto err_2;
     }
 
+    debug_printf("obj_init: > text_object_init\n");
     if (text_object_init(buf, width, height) == -1) {
+        debug_printf("obj_init: text_object_init FAILED\n");
         goto err_2;
     }
 

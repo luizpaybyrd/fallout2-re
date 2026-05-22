@@ -185,23 +185,35 @@ int game_init(const char* windowTitle, bool isMapper, int font, int a4, int argc
     tile_disable_refresh();
 
     roll_init();
+    debug_printf("game_init: > init_message\n");
     init_message();
+    debug_printf("game_init: > skill_init\n");
     skill_init();
+    debug_printf("game_init: > stat_init\n");
     stat_init();
 
+    debug_printf("game_init: > partyMember_init\n");
     if (partyMember_init() != 0) {
         debug_printf("Failed on partyMember_init\n");
         return -1;
     }
 
+    debug_printf("game_init: > perk_init\n");
     perk_init();
+    debug_printf("game_init: > trait_init\n");
     trait_init();
+    debug_printf("game_init: > item_init\n");
     item_init();
+    debug_printf("game_init: > queue_init\n");
     queue_init();
+    debug_printf("game_init: > critter_init\n");
     critter_init();
+    debug_printf("game_init: > combat_ai_init\n");
     combat_ai_init();
+    debug_printf("game_init: > inven_reset_dude\n");
     inven_reset_dude();
 
+    debug_printf("game_init: > gsound_init\n");
     if (gsound_init() != 0) {
         debug_printf("Sound initialization failed.\n");
     }

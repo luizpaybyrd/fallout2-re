@@ -28,6 +28,7 @@
 #include "game/gmouse.h"
 #include "game/gmovie.h"
 #include "game/gsound.h"
+#include "game/item.h"
 #include "game/loadsave.h"
 #include "game/mainmenu.h"
 #include "game/map.h"
@@ -54,6 +55,7 @@ static int main_load_new(char* fname);
 static int main_loadgame_new();
 static void main_unload_new();
 static void main_game_loop();
+static void spawn_tutorial_box();
 static bool main_selfrun_init();
 static void main_selfrun_exit();
 static void main_selfrun_record();
@@ -128,6 +130,7 @@ int RealMain(int argc, char** argv)
                     gmovie_play(MOVIE_ELDER, GAME_MOVIE_STOP_MUSIC);
                     roll_set_seed(-1);
                     main_load_new(mainMap);
+                    spawn_tutorial_box();
                     main_game_loop();
                     palette_fade_to(white_palette);
 
@@ -319,6 +322,43 @@ static void main_unload_new()
 {
     obj_turn_off(obj_dude, NULL);
     map_exit();
+}
+
+// NOTE: Not in the original binary. Drops a footlocker containing a 10mm
+// pistol one tile north of the player's spawn after main_load_new returns.
+// Engine-side content mod hooked into the New Game flow.
+static void spawn_tutorial_box()
+{
+    if (obj_dude == NULL) {
+        debug_printf("spawn_tutorial_box: obj_dude is NULL, skipping\n");
+        return;
+    }
+
+    Object* footlocker = NULL;
+    if (obj_pid_new(&footlocker, 128) == -1) {
+        debug_printf("spawn_tutorial_box: obj_pid_new(footlocker, 128) failed\n");
+        return;
+    }
+
+    int spawnTile = obj_dude->tile - 200;
+    if (obj_connect(footlocker, spawnTile, obj_dude->elevation, NULL) == -1) {
+        debug_printf("spawn_tutorial_box: obj_connect failed at tile %d\n", spawnTile);
+        return;
+    }
+
+    Object* pistol = NULL;
+    if (obj_pid_new(&pistol, 8) == -1) {
+        debug_printf("spawn_tutorial_box: obj_pid_new(pistol, 8) failed\n");
+        return;
+    }
+
+    if (item_add_force(footlocker, pistol, 1) == -1) {
+        debug_printf("spawn_tutorial_box: item_add_force failed\n");
+        return;
+    }
+
+    debug_printf("spawn_tutorial_box: OK footlocker at tile %d (player tile %d)\n",
+        spawnTile, obj_dude->tile);
 }
 
 // 0x480E48

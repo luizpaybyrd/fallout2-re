@@ -63,6 +63,21 @@ void debug_register_log(const char* fileName, const char* mode)
     }
 }
 
+// NOTE: Not in the original binary. The condition in debug_register_log above
+// is impossible (mode[1] == 'a' && mode[1] == 't'), so that function never
+// opens the file. This is a working alternative used for diagnostic builds.
+void debug_register_log_force(const char* fileName, const char* mode)
+{
+    if (fd != NULL) {
+        fclose(fd);
+    }
+
+    fd = fopen(fileName, mode);
+    if (fd != NULL) {
+        debug_func = debug_log;
+    }
+}
+
 // 0x4C6D5C
 void debug_register_screen()
 {

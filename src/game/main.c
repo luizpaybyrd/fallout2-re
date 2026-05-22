@@ -87,11 +87,16 @@ static bool main_death_voiceover_done;
 // 0x48099C
 int RealMain(int argc, char** argv)
 {
+    debug_register_log_force("debug.log", "wt");
+    debug_printf("RealMain: log opened\n");
+
     if (!autorun_mutex_create()) {
+        debug_printf("RealMain: autorun_mutex_create failed\n");
         return 1;
     }
 
     if (!main_init_system(argc, argv)) {
+        debug_printf("RealMain: main_init_system failed\n");
         return 1;
     }
 

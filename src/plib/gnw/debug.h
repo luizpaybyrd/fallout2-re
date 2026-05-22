@@ -6,6 +6,7 @@ typedef int(DebugPrintProc)(char* string);
 void GNW_debug_init();
 void debug_register_mono();
 void debug_register_log(const char* fileName, const char* mode);
+void debug_register_log_force(const char* fileName, const char* mode);
 void debug_register_screen();
 void debug_register_env();
 void debug_register_func(DebugPrintProc* proc);

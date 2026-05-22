@@ -521,8 +521,15 @@ int tile_set_center(int tile, int flags)
         }
     }
 
-    int tile_x = grid_width - 1 - tile % grid_width;
-    int tile_y = tile / grid_width;
+    // NOTE: The original decompilation declared `int tile_x` / `int tile_y`
+    // locals here that shadowed the file-scope globals of the same name,
+    // turning the writebacks below into self-assigning no-ops. With the
+    // globals left at zero, tile_num() then walked off-grid in tile_set_border
+    // and produced a garbage border rect that rejected every subsequent
+    // tile_set_center call. Assigning directly to the globals restores the
+    // intended behavior preserved in the original binary.
+    tile_x = grid_width - 1 - tile % grid_width;
+    tile_y = tile / grid_width;
 
     if (borderInitialized) {
         if (tile_x <= tile_border.ulx || tile_x >= tile_border.lrx || tile_y <= tile_border.uly || tile_y >= tile_border.lry) {
@@ -530,9 +537,7 @@ int tile_set_center(int tile, int flags)
         }
     }
 
-    tile_y = tile_y;
     tile_offx = (buf_width - 32) / 2;
-    tile_x = tile_x;
     tile_offy = (buf_length - 16) / 2;
 
     if (tile_x & 1) {

@@ -3240,26 +3240,38 @@ static int obj_offset_table_init()
 {
     int i;
 
+    debug_printf("obj_offset_table_init: updateHexWidth=%d updateHexHeight=%d updateHexArea=%d tile_center_tile=%d\n",
+        updateHexWidth, updateHexHeight, updateHexArea, tile_center_tile);
+    debug_printf("obj_offset_table_init: updateAreaPixelBounds ul=(%d,%d) lr=(%d,%d)\n",
+        updateAreaPixelBounds.ulx, updateAreaPixelBounds.uly,
+        updateAreaPixelBounds.lrx, updateAreaPixelBounds.lry);
+
     if (offsetTable[0] != NULL) {
+        debug_printf("obj_offset_table_init: FAIL offsetTable[0] != NULL\n");
         return -1;
     }
 
     if (offsetTable[1] != NULL) {
+        debug_printf("obj_offset_table_init: FAIL offsetTable[1] != NULL\n");
         return -1;
     }
 
     offsetTable[0] = (int*)mem_malloc(sizeof(int) * updateHexArea);
     if (offsetTable[0] == NULL) {
+        debug_printf("obj_offset_table_init: FAIL mem_malloc offsetTable[0]\n");
         goto err;
     }
 
     offsetTable[1] = (int*)mem_malloc(sizeof(int) * updateHexArea);
     if (offsetTable[1] == NULL) {
+        debug_printf("obj_offset_table_init: FAIL mem_malloc offsetTable[1]\n");
         goto err;
     }
 
     for (int parity = 0; parity < 2; parity++) {
+        debug_printf("obj_offset_table_init: parity=%d entering\n", parity);
         int originTile = tile_num(updateAreaPixelBounds.ulx, updateAreaPixelBounds.uly, 0);
+        debug_printf("obj_offset_table_init: parity=%d originTile=%d\n", parity, originTile);
         if (originTile != -1) {
             int* offsets = offsetTable[tile_center_tile & 1];
             int originTileX;
@@ -3278,6 +3290,8 @@ static int obj_offset_table_init()
                 for (int x = 0; x < updateHexWidth; x++) {
                     int tile = tile_num(tileX, originTileY, 0);
                     if (tile == -1) {
+                        debug_printf("obj_offset_table_init: FAIL tile_num parity=%d x=%d y=%d tileX=%d originTileY=%d\n",
+                            parity, x, y, tileX, originTileY);
                         goto err;
                     }
 
@@ -3292,12 +3306,16 @@ static int obj_offset_table_init()
         }
 
         if (tile_set_center(tile_center_tile + 1, TILE_SET_CENTER_FLAG_IGNORE_SCROLL_RESTRICTIONS) == -1) {
+            debug_printf("obj_offset_table_init: FAIL tile_set_center parity=%d tile_center_tile=%d\n",
+                parity, tile_center_tile);
             goto err;
         }
     }
 
+    debug_printf("obj_offset_table_init: > offsetDivTable mem_malloc\n");
     offsetDivTable = (int*)mem_malloc(sizeof(int) * updateHexArea);
     if (offsetDivTable == NULL) {
+        debug_printf("obj_offset_table_init: FAIL mem_malloc offsetDivTable\n");
         goto err;
     }
 
@@ -3305,8 +3323,10 @@ static int obj_offset_table_init()
         offsetDivTable[i] = i / updateHexWidth;
     }
 
+    debug_printf("obj_offset_table_init: > offsetModTable mem_malloc\n");
     offsetModTable = (int*)mem_malloc(sizeof(int) * updateHexArea);
     if (offsetModTable == NULL) {
+        debug_printf("obj_offset_table_init: FAIL mem_malloc offsetModTable\n");
         goto err;
     }
 
@@ -3314,6 +3334,7 @@ static int obj_offset_table_init()
         offsetModTable[i] = i % updateHexWidth;
     }
 
+    debug_printf("obj_offset_table_init: OK\n");
     return 0;
 
 err:
